@@ -1,18 +1,50 @@
 defmodule MoxEnv do
-  @moduledoc """
-  Documentation for MoxEnv.
-  """
+  @callback get(key, default) :: term | default when key: atom, default: term
 
-  @doc """
-  Hello world.
+  defmacro __using__(opts \\ []) do
+    module = Keyword.fetch!(opts, :config)
 
-  ## Examples
+    quote do
+      @behaviour MoxEnv
 
-      iex> MoxEnv.hello()
-      :world
+      def get(key, default \\ nil) do
+        case ensure_started_and_call({:fetch_fun_to_dispatch, self(), make_key(key)}) do
+          {:ok, value} -> value
+          :no_expectation -> unquote(module).get(key, default)
+        end
+      end
 
-  """
-  def hello do
-    :world
+      def put_env(key, value, owner_pid \\ self()) do
+        ensure_started_and_call({:add_expectation, owner_pid, make_key(key), make_value(value)})
+      end
+
+      def allow_env(pid, owner \\ self()) do
+        ensure_started_and_call({:allow, __MODULE__, owner, pid})
+      end
+
+      def set_mode(owner_pid, mode) do
+        ensure_started_and_call({:set_mode, owner_pid, mode})
+      end
+
+      def set_env_from_context(%{async: true} = _context), do: set_mode(self(), :private)
+      def set_env_from_context(_context), do: set_mode(self(), :global)
+
+      defp make_key(config_key) do
+        {__MODULE__, config_key, 0}
+      end
+
+      defp make_value(value) do
+        {0, [], value}
+      end
+
+      defp ensure_started_and_call(message) do
+        case Process.whereis(__MODULE__) do
+          nil -> GenServer.start_link(Mox.Server, :ok, name: __MODULE__)
+          _or -> :ok
+        end
+
+        GenServer.call(__MODULE__, message)
+      end
+    end
   end
 end
