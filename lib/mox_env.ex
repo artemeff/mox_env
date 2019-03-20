@@ -8,7 +8,7 @@ defmodule MoxEnv do
       @behaviour MoxEnv
 
       def get(key, default \\ nil) do
-        case ensure_started_and_call({:fetch_fun_to_dispatch, self(), make_key(key)}) do
+        case ensure_started_and_call({:fetch_fun_to_dispatch, [self() | caller_pids()], make_key(key)}) do
           {:ok, value} -> value
           :no_expectation -> unquote(module).get(key, default)
         end
@@ -44,6 +44,13 @@ defmodule MoxEnv do
         end
 
         GenServer.call(__MODULE__, message)
+      end
+
+      defp caller_pids do
+        case Process.get(:"$callers") do
+          nil -> []
+          pids when is_list(pids) -> pids
+        end
       end
     end
   end
