@@ -18,7 +18,7 @@ end
 
 # myapp/test/support/config_mock.ex
 defmodule MyApp.ConfigMock do
-  use MoxEnv, otp_app: :mox_env
+  use MoxEnv, config: MyApp.Config
 end
 
 # myapp/lib/myapp.ex
