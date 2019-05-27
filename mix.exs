@@ -4,7 +4,7 @@ defmodule MoxEnv.MixProject do
   def project do
     [
       app: :mox_env,
-      version: "0.5.0",
+      version: "0.5.1",
       elixir: "~> 1.5",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -23,7 +23,7 @@ defmodule MoxEnv.MixProject do
 
   defp deps do
     [
-      {:mox, "0.5.0"},
+      {:mox, "~> 0.5.0"},
       {:ex_doc, "~> 0.19", only: :dev},
     ]
   end
