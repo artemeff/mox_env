@@ -9,7 +9,7 @@ defmodule MoxEnv do
 
       def get(key, default \\ nil) do
         case ensure_started_and_call({:fetch_fun_to_dispatch, [self() | caller_pids()], make_key(key)}) do
-          {:ok, value} -> value
+          {:ok, fun} -> fun.()
           :no_expectation -> unquote(module).get(key, default)
         end
       end
@@ -34,7 +34,7 @@ defmodule MoxEnv do
       end
 
       defp make_value(value) do
-        {0, [], value}
+        {0, [], fn -> value end}
       end
 
       defp ensure_started_and_call(message) do
