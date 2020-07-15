@@ -12,7 +12,7 @@ It's your application config but simply mocked with Mox.
 # myapp/lib/myapp/config.ex
 defmodule MyApp.Config do
   def get(key, default \\ nil) do
-    Application.get_env(:mox_env, key, default)
+    Application.get_env(:my_app, key, default)
   end
 end
 
