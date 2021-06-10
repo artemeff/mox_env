@@ -6,12 +6,16 @@ defmodule MoxEnv do
 
     quote do
       @behaviour MoxEnv
+      @server Mox.Server
 
       def get(key, default \\ nil) do
         case call({:fetch_fun_to_dispatch, [self() | caller_pids()], make_key(key)}) do
           {:ok, fun} -> fun.()
           :no_expectation -> unquote(module).get(key, default)
         end
+      catch
+        :exit, {:noproc, _} ->
+          unquote(module).get(key, default)
       end
 
       def put_env(key, value, owner_pid \\ self()) do
@@ -22,12 +26,15 @@ defmodule MoxEnv do
         call({:allow, __MODULE__, owner, pid})
       end
 
-      def set_mode(owner_pid, mode) do
-        call({:set_mode, owner_pid, mode})
-      end
+      def set_env_from_context(context) do
+        IO.puts(
+          :stderr,
+          "#{inspect(__MODULE__)}.set_env_from_context/1 is deprecated, please use Mox.set_mox_from_context/1 instead\n" <>
+            Exception.format_stacktrace()
+        )
 
-      def set_env_from_context(%{async: true} = _context), do: set_mode(self(), :private)
-      def set_env_from_context(_context), do: set_mode(self(), :global)
+        Mox.set_mox_from_context(context)
+      end
 
       defp make_key(config_key) do
         {__MODULE__, config_key, 0}
@@ -38,7 +45,7 @@ defmodule MoxEnv do
       end
 
       defp call(message) do
-        GenServer.call(Mox.Server, message)
+        GenServer.call(@server, message)
       end
 
       defp caller_pids do

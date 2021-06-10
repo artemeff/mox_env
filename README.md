@@ -48,6 +48,25 @@ iex> MyApp.ConfigMock.put_env(:test_key, :new_value)
 :new_value
 ```
 
+And import some handy helpers into your test cases:
+
+```elixir
+defmodule MyApp.ConnCase do
+  use ExUnit.CaseTemplate
+
+  # ...
+
+  using do
+    import Mox
+    import MyApp.ConfigMock, only: [put_env: 2, put_env: 3, allow_env: 1, allow_env: 2]
+
+    setup [:set_mox_from_context, :verify_on_exit!]
+  end
+
+  # ...
+end
+```
+
 ---
 
 ### Contributing
