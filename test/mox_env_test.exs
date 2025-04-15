@@ -24,7 +24,7 @@ defmodule MoxEnvTest do
       assert :default_value == App.test_key_default()
     end
 
-    test "#test_key_default (override)" do
+    test "#test_key_default override" do
       App.ConfigMock.put_env(:test_key_default, :non_default_value)
 
       assert :non_default_value == App.test_key_default()
@@ -34,6 +34,14 @@ defmodule MoxEnvTest do
       App.ConfigMock.put_env(:test_key_default, nil)
 
       assert nil == App.test_key_default()
+    end
+
+    test "#test_key_default override twice" do
+      App.ConfigMock.put_env(:test_key_default, 1)
+      App.ConfigMock.put_env(:test_key_default, 2)
+
+      assert 2 == App.test_key_default()
+      assert 2 == App.test_key_default()
     end
   end
 end

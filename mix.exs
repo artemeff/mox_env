@@ -4,8 +4,8 @@ defmodule MoxEnv.MixProject do
   def project do
     [
       app: :mox_env,
-      version: "1.0.0",
-      elixir: "~> 1.5",
+      version: "1.1.0",
+      elixir: "~> 1.11",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -18,7 +18,8 @@ defmodule MoxEnv.MixProject do
 
   def application do
     [
-      extra_applications: []
+      extra_applications: [:logger],
+      mod: {MoxEnv.Application, []}
     ]
   end
 
@@ -27,13 +28,13 @@ defmodule MoxEnv.MixProject do
 
   defp deps do
     [
-      {:mox, "~> 1.0.0"},
-      {:ex_doc, "~> 0.24", only: :dev}
+      {:nimble_ownership, "~> 1.0"},
+      {:ex_doc, "~> 0.37", only: :dev}
     ]
   end
 
   defp description do
-    "It's your application config but simply mocked with Mox."
+    "It's your application config but simply mocked with NimbleOwnership like Mox"
   end
 
   defp package do
