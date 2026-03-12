@@ -2,7 +2,7 @@
 
 ---
 
-It's your application config but simply mocked with Mox.
+It's your application config but simply mocked with NimbleOwnership like Mox.
 
 ---
 
@@ -58,9 +58,13 @@ defmodule MyApp.ConnCase do
 
   using do
     import Mox
-    import MyApp.ConfigMock, only: [put_env: 2, put_env: 3, allow_env: 1, allow_env: 2]
+    import MyApp.ConfigMock
 
-    setup [:set_mox_from_context, :verify_on_exit!]
+    setup [
+      :set_mox_from_context,
+      :set_env_from_context,
+      :verify_on_exit!
+    ]
   end
 
   # ...
