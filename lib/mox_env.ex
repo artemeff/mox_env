@@ -102,14 +102,18 @@ defmodule MoxEnv do
 
   defp fetch_fun_to_dispatch(caller_pids, module, key) do
     with {:ok, owner_pid} <- fetch_owner_from_callers(caller_pids, module) do
-      get_and_update!(owner_pid, module, fn(state) ->
-        case Map.fetch(state, key) do
-          {:ok, term} ->
-            {{:ok, term}, state}
+      get_and_update!(owner_pid, module, fn
+        (%{} = state) ->
+          case Map.fetch(state, key) do
+            {:ok, term} ->
+              {{:ok, term}, state}
 
-          :error ->
-            {:no_expectation, state}
-        end
+            :error ->
+              {:no_expectation, state}
+          end
+
+        (nil = state) ->
+          {:no_expectation, state}
       end)
     end
   end
